@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from 'gatsby'
 
 const EventPreview = ({ data }) => {
   const event = data
@@ -8,9 +9,9 @@ const EventPreview = ({ data }) => {
       className="event"
       style={{ marginBottom: "20px", background: "#eee" }}
     >
-      <a href={'/event/' + event.id}>
+      <Link to={'/event/' + event.id} activeClassName="active">
         <h2>{event.title}</h2>
-      </a>
+      </Link>
       <p>{event.locationState}</p>
       <p>{event.startDate}</p>
       <img height="100px" src={event.thumbnailImage} alt={event.title} />

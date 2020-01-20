@@ -4,10 +4,13 @@ import EventList from '../components/EventList'
 import Layout from '../components/layout';
 import { globalHistory } from '@reach/router'
 import Event from '../components/Event'
+import { Link } from 'gatsby';
+
 
 function EventPage() {
 
   const [data, setData] = useState([]);
+  const [id, setId] = useState('');
 
   function getParameter(url) {
     console.log('getParameter2: ' + url)
@@ -24,41 +27,39 @@ function EventPage() {
     return event[0]
   }
 
+  // check the url for a parameter after /event
+  const path = globalHistory.location.pathname
+  let parameter = getParameter(path)
+
   useEffect(() => {
     const endpointEvents = 'https://missionone.com.au/api/events/'
     const token = process.env.GATSBY_MISSION_ONE_API_TOKEN
 
     getDataFromServer(endpointEvents, token)
       .then(data => {
-
-        // check the url for a parameter after /event
-        const path = globalHistory.location.pathname
-        let parameter = getParameter(path)
-        let event = null
-
-        // if we have a parameter then data is a single event
-        if (parameter !== '') {
-          event = getEventFromID(data, parameter)
-          setData(event)
-        } else {
-          setData(data)
-        }
+        setData(data)
+        setId(getParameter(path))
       })
   }, [])
 
+  useEffect(() => {
+    setId(parameter)
+  }, [parameter])
+
+
   let eventComponent
-  if (data.length === 0 || data == null) {
+  if (id === '' & data.length === 0) {
     eventComponent = <div>Loading...</div>
-  } else if (data.length > 1) {
-    eventComponent = <EventList data={data} />
+  } else if (id !== '') {
+    let event = getEventFromID(data, parameter)
+    eventComponent = <Event data={event} />
   } else {
-    eventComponent = <Event data={data} />
+    eventComponent = <EventList data={data} />
   }
 
   return (
     <Layout>
-      <h2>Events</h2>
-      {console.log(data)}
+      <Link to="/event"><h2>Events</h2></Link>
       {eventComponent}
     </Layout>
   )
